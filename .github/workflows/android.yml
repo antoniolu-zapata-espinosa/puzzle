@@ -20,17 +20,15 @@ jobs:
         if [ -f imagenes.json ]; then cp imagenes.json www/; fi
         if [ -d imagenes ]; then cp -r imagenes www/; fi
 
-    - name: Build Android APK
-      uses: unvwired/build-android-action@v1.0
+    - name: Convert HTML to APK
+      uses: darkshredder/web-to-app-action@main
       with:
+        build-folder-path: "www"
         app-name: "Puzzle Sorpresa"
-        input-dir: "www"
-        package-name: "com.puzzle.hija"
+        output-folder-path: "mis-apks"
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: PuzzleHija-APK
-        path: app-debug.apk
-
-
+        path: mis-apks/
