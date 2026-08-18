@@ -179,14 +179,22 @@
         let currentImgUrl = null;
         let repository = [];
 
-        async function loadRepository() {
+                async function loadRepository() {
             try {
                 const response = await fetch('imagenes.json');
                 const fileNames = await response.json();
                 repository = fileNames.map(name => ({
-                    name: name.split('.')[0].toUpperCase(),
+                    // Esto limpia el nombre quitando el ".jpg" para usarlo de título
+                    name: "🖼️ " + name.split('.')[0].toUpperCase(),
                     url: `imagenes/${name}`
                 }));
+                selectRandomImage();
+            } catch (error) {
+                imageTitle.textContent = "Error: ¡Asegúrate de crear el archivo imagenes.json!";
+                console.error(error);
+            }
+        }
+
                 selectRandomImage();
             } catch (error) {
                 imageTitle.textContent = "Error al cargar las fotos";
