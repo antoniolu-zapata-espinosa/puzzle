@@ -1,0 +1,17 @@
+{
+  "short_name": "Puzzle",
+  "name": "Puzzle Sorpresa de mi Hija",
+  "icons": [
+    {
+      "src": "imagenes/perrito.jpg",
+      "type": "image/jpeg",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#ffeaa7",
+  "display": "standalone",
+  "theme_color": "#ff7675",
+  "orientation": "portrait"
+}
