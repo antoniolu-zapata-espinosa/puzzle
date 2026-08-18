@@ -179,12 +179,12 @@
                 const fileNames = await response.json();
                 
                 repository = fileNames.map(name => {
-                    let cleanName = name.replace(/\.[^/.]+$/, "");
-                    return {
-                        name: "🧩 " + cleanName.toUpperCase(),
-                        url: '/imagenes/${name}'
-                    };
-                });
+    let cleanName = name.replace(/\.[^/.]+$/, "");
+    return {
+        name: "🧩 " + cleanName.toUpperCase(),
+        url: `/imagenes/${name}`
+    };
+});
                 
                 selectRandomImage();
             } catch (error) {
