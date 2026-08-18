@@ -10,45 +10,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Descargar el código fuente
+    # 1. Descargar los archivos del juego
     - name: Checkout Source Code
       uses: actions/checkout@v4.2.2
 
-    # 2. Configurar Java (Requisito oficial para compilar Android)
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
+    # 2. Estructurar la carpeta interna del juego
+    - name: Prepare Assets Folder
+      run: |
+        mkdir -p www
+        cp index.html www/
+        if [ -f imagenes.json ]; then cp imagenes.json www/; fi
+        if [ -d imagenes ]; then cp -r imagenes www/; fi
+
+    # 3. Compilar directamente el HTML a una App Nativa usando contenedores estables
+    - name: Build Android APK
+      uses: fllesno/android-build-action@v1
       with:
-        distribution: 'zulu'
-        java-version: '17'
+        app-name: "Puzzle Sorpresa"
+        package-id: "com.puzzle.hija"
+        web-dir: "www"
 
-    # 3. Instalar las herramientas de desarrollo nativas de Android (CLI)
-    - name: Install Cordova CLI (Motor nativo estable)
-      run: npm install -g cordova
-
-    # 4. Crear el contenedor nativo y mover tus archivos
-    - name: Create Native Android App
-      run: |
-        cordova create mi-app com.puzzle.hija "Puzzle Sorpresa"
-        cd mi-app
-        cordova platform add android
-        
-        # Limpiar la carpeta por defecto del contenedor
-        rm -rf www/*
-        
-        # Copiar tus archivos del rompecabezas al contenedor nativo
-        cp ../index.html www/
-        if [ -f ../imagenes.json ]; then cp ../imagenes.json www/; fi
-        if [ -d ../imagenes ]; then cp -r ../imagenes www/; fi
-
-    # 5. Compilar el archivo APK oficial usando Gradle
-    - name: Build Android APK with Gradle
-      run: |
-        cd mi-app
-        cordova build android --debug
-
-    # 6. Guardar y entregar el APK listo para descargar
+    # 4. Guardar y entregar el APK listo para descargar
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4.6.0
       with:
         name: PuzzleHija-APK
-        path: mi-app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        path: "*.apk"
