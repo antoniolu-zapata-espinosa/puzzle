@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡El Gran Rompecabezas Sorpresa!</title>
-    <link rel="manifest" href="manifest.json">
+    <title>¡El Gran Rompecabezas de mi Hija!</title>
     <style>
         :root {
             --primary: #ff7675;
@@ -23,17 +22,8 @@
         }
         h1 {
             color: #d63031;
-            margin: 0 0 5px 0;
-            text-shadow: 2px 2px 0px #fff;
-        }
-        h2 {
-            color: #2d3436;
             margin: 0 0 15px 0;
-            font-size: 18px;
-            background: white;
-            padding: 5px 15px;
-            border-radius: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-shadow: 2px 2px 0px #fff;
         }
         .controls {
             background: white;
@@ -45,34 +35,24 @@
             gap: 15px;
             align-items: center;
         }
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
+        select, button {
+            background: white;
+            border: 2px solid var(--primary);
             padding: 10px 20px;
             border-radius: 25px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 0px #ee5253;
             transition: transform 0.1s;
         }
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 0px #ee5253;
+        }
         button:active { transform: translateY(4px); box-shadow: none; }
-        .btn-blue {
-            background: var(--accent);
-            box-shadow: 0 4px 0px #0984e3;
-        }
         
-        .game-layout {
-            display: flex;
-            flex-direction: row;
-            gap: 30px;
-            align-items: flex-start;
-            justify-content: center;
-            max-width: 1100px;
-            width: 100%;
-        }
-
         #board-container {
             position: relative;
             width: 500px;
@@ -81,17 +61,16 @@
             border: 4px dashed #b2bec3;
             border-radius: 12px;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
-            flex-shrink: 0;
         }
         .grid-slot {
             position: absolute;
             border: 1px rgba(0,0,0,0.15) solid;
             box-sizing: border-box;
         }
-        
         #pieces-pool {
             width: 500px;
-            min-height: 400px;
+            min-height: 120px;
+            margin-top: 25px;
             background: white;
             border-radius: 15px;
             padding: 15px;
@@ -100,7 +79,7 @@
             flex-wrap: wrap;
             gap: 10px;
             justify-content: center;
-            align-content: flex-start;
+            align-items: center;
         }
         .piece {
             position: absolute;
@@ -125,37 +104,36 @@
             font-weight: bold;
             text-shadow: 1px 1px 0 #fff;
         }
-
-        @media (max-width: 1050px) {
-            .game-layout {
-                flex-direction: column;
-                align-items: center;
-            }
-            #pieces-pool {
-                min-height: 120px;
-                width: 500px;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <h1>🧩 ¡Rompecabezas Sorpresa! 🧩</h1>
-    <h2 id="image-title">Cargando juego...</h2>
+    <h1>🧩 ¡Mi Rompecabezas de 20 Piezas! 🧩</h1>
 
     <div class="controls">
-        <button onclick="initPuzzle()">Reiniciar este puzzle</button>
-        <button class="btn-blue" onclick="selectRandomImage()">🎲 ¡Cambiar imagen al azar!</button>
+        <label for="image-select" style="font-weight: bold;">Elige un dibujo: </label>
+        <select id="image-select" onchange="initPuzzle()"></select>
+        <button onclick="initPuzzle()">Reiniciar</button>
     </div>
 
-    <div class="game-layout">
-        <div id="board-container"></div>
-        <div id="pieces-pool"></div>
-    </div>
-
+    <div id="board-container"></div>
+    <div id="pieces-pool"></div>
     <div id="win-message">🎉 ¡Felicidades! ¡Lo lograste! 🎉</div>
 
     <script>
+        // ========================================================
+        // 📸 REPOSITORIO: Añade o cambia aquí los nombres de tus fotos
+        // Recuerda guardarlas dentro de la carpeta "imagenes/"
+        // ========================================================
+        const repository = [
+            { name: "Bluey con la familia", url: "imagenes/Bluey con la familia.jpg" },
+            { name: "Bluey en el columpio", url: "imagenes/Bluey en el columpio.jpg" },
+            { name: "Bluey en el parque", url: "imagenes/Bluey en el parque.jpg" },
+            { name: "Bluey volando", url: "imagenes/Bluey volando.jpg" },
+            { name: "Peppa pig con la familia", url: "imagenes/Peppa pig con la familia.jpg" },
+            { name: "Spidey con amigos", url: "imagenes/Spidey con amigos.jpg" }
+        ];
+
         const COLS = 5;
         const ROWS = 4;
         const TOTAL_PIECES = COLS * ROWS;
@@ -166,49 +144,18 @@
 
         const board = document.getElementById("board-container");
         const pool = document.getElementById("pieces-pool");
-        const imageTitle = document.getElementById("image-title");
+        const select = document.getElementById("image-select");
         const winMessage = document.getElementById("win-message");
 
         let piecesPlaced = 0;
-        let currentImgUrl = null;
-        let repository = [];
 
-        async function loadRepository() {
-            try {
-                const response = await fetch('imagenes.json?v=' + Math.random());
-                const fileNames = await response.json();
-                
-                repository = fileNames.map(name => {
-    let cleanName = name.replace(/\.[^/.]+$/, "");
-    return {
-        name: "🧩 " + cleanName.toUpperCase(),
-        url: `imagenes/${name}`
-    };
-});
-                
-                selectRandomImage();
-            } catch (error) {
-                imageTitle.textContent = "Error al cargar las fotos. Revisa tu imagenes.json";
-                console.error(error);
-            }
-        }
-
-        function selectRandomImage() {
-            if (repository.length === 0) return;
-            
-            let nextImg;
-            if (repository.length === 1) {
-                nextImg = repository[0];
-            } else {
-                const availableImages = repository.filter(img => img.url !== currentImgUrl);
-                const randomIndex = Math.floor(Math.random() * availableImages.length);
-                nextImg = availableImages[randomIndex];
-            }
-
-            currentImgUrl = nextImg.url;
-            imageTitle.textContent = `Estás jugando: ${nextImg.name}`;
-            initPuzzle();
-        }
+        // Rellenar el selector con el repositorio de fotos
+        repository.forEach(img => {
+            let option = document.createElement("option");
+            option.value = img.url;
+            option.textContent = img.name;
+            select.appendChild(option);
+        });
 
         function initPuzzle() {
             board.innerHTML = "";
@@ -216,7 +163,7 @@
             winMessage.style.display = "none";
             piecesPlaced = 0;
 
-            if (!currentImgUrl) return;
+            const currentImgUrl = select.value;
             let piecesArray = [];
 
             for (let r = 0; r < ROWS; r++) {
@@ -255,23 +202,29 @@
 
         function makeDraggable(el) {
             let startX, startY, isDragging = false;
+
             el.addEventListener('mousedown', dragStart);
             el.addEventListener('touchstart', dragStart, { passive: false });
 
             function dragStart(e) {
                 if (el.dataset.locked === "true") return;
                 isDragging = true;
-                if (el.classList.contains('in-pool')) { 
-                    el.classList.remove('in-pool'); 
-                    board.appendChild(el); 
+                
+                if (el.classList.contains('in-pool')) {
+                    el.classList.remove('in-pool');
+                    board.appendChild(el);
                 }
+
                 const clientX = e.touches ? e.touches.clientX : e.clientX;
                 const clientY = e.touches ? e.touches.clientY : e.clientY;
+
                 const rect = board.getBoundingClientRect();
                 el.style.left = `${clientX - rect.left - (PIECE_WIDTH / 2)}px`;
                 el.style.top = `${clientY - rect.top - (PIECE_HEIGHT / 2)}px`;
-                startX = clientX - el.offsetLeft; 
+
+                startX = clientX - el.offsetLeft;
                 startY = clientY - el.offsetTop;
+
                 document.addEventListener('mousemove', dragMove);
                 document.addEventListener('touchmove', dragMove, { passive: false });
                 document.addEventListener('mouseup', dragEnd);
@@ -283,7 +236,40 @@
                 if (e.cancelable) e.preventDefault();
                 const clientX = e.touches ? e.touches.clientX : e.clientX;
                 const clientY = e.touches ? e.touches.clientY : e.clientY;
-                el.style.left = `${clientX - startX}px`; 
+                el.style.left = `${clientX - startX}px`;
                 el.style.top = `${clientY - startY}px`;
             }
 
+            function dragEnd() {
+                if (!isDragging) return;
+                isDragging = false;
+
+                document.removeEventListener('mousemove', dragMove);
+                document.removeEventListener('touchmove', dragMove);
+                document.removeEventListener('mouseup', dragEnd);
+                document.removeEventListener('touchend', dragEnd);
+
+                const currentX = parseFloat(el.style.left);
+                const currentY = parseFloat(el.style.top);
+                const targetX = parseFloat(el.dataset.correctX);
+                const targetY = parseFloat(el.dataset.correctY);
+
+                if (Math.abs(currentX - targetX) < 35 && Math.abs(currentY - targetY) < 35) {
+                    el.style.left = `${targetX}px`;
+                    el.style.top = `${targetY}px`;
+                    el.dataset.locked = "true";
+                    el.style.cursor = "default";
+                    el.style.boxShadow = "none";
+                    piecesPlaced++;
+                    if (piecesPlaced === TOTAL_PIECES) winMessage.style.display = "block";
+                } else {
+                    el.classList.add('in-pool');
+                    pool.appendChild(el);
+                }
+            }
+        }
+
+        window.onload = initPuzzle;
+    </script>
+</body>
+</html>
