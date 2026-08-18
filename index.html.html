@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡El Gran Rompecabezas Sorpresa!</title>
+    <title>¡El Gran Rompecabezas de mi Hija!</title>
     <style>
         :root {
             --primary: #ff7675;
@@ -22,17 +22,8 @@
         }
         h1 {
             color: #d63031;
-            margin: 0 0 5px 0;
-            text-shadow: 2px 2px 0px #fff;
-        }
-        h2 {
-            color: #2d3436;
             margin: 0 0 15px 0;
-            font-size: 18px;
-            background: white;
-            padding: 5px 15px;
-            border-radius: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-shadow: 2px 2px 0px #fff;
         }
         .controls {
             background: white;
@@ -44,23 +35,23 @@
             gap: 15px;
             align-items: center;
         }
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
+        select, button {
+            background: white;
+            border: 2px solid var(--primary);
             padding: 10px 20px;
             border-radius: 25px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 0px #ee5253;
             transition: transform 0.1s;
         }
-        button:active { transform: translateY(4px); box-shadow: none; }
-        .btn-blue {
-            background: var(--accent);
-            box-shadow: 0 4px 0px #0984e3;
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 0px #ee5253;
         }
+        button:active { transform: translateY(4px); box-shadow: none; }
         
         #board-container {
             position: relative;
@@ -117,13 +108,12 @@
 </head>
 <body>
 
-    <h1>🧩 ¡Rompecabezas Sorpresa! 🧩</h1>
-    <!-- Aquí se mostrará el nombre de la foto que tocó al azar -->
-    <h2 id="image-title">Buscando foto...</h2>
+    <h1>🧩 ¡Mi Rompecabezas de 20 Piezas! 🧩</h1>
 
     <div class="controls">
-        <button onclick="initPuzzle()">Reiniciar este puzzle</button>
-        <button class="btn-blue" onclick="selectRandomImage()">🎲 ¡Cambiar imagen al azar!</button>
+        <label for="image-select" style="font-weight: bold;">Elige un dibujo: </label>
+        <select id="image-select" onchange="initPuzzle()"></select>
+        <button onclick="initPuzzle()">Reiniciar</button>
     </div>
 
     <div id="board-container"></div>
@@ -132,7 +122,8 @@
 
     <script>
         // ========================================================
-        // 📸 REPOSITORIO: Añade aquí las fotos que quieras
+        // 📸 REPOSITORIO: Añade o cambia aquí los nombres de tus fotos
+        // Recuerda guardarlas dentro de la carpeta "imagenes/"
         // ========================================================
         const repository = [
             { name: "Bluey con la familia", url: "imagenes/Bluey con la familia.jpg" },
@@ -153,31 +144,18 @@
 
         const board = document.getElementById("board-container");
         const pool = document.getElementById("pieces-pool");
-        const imageTitle = document.getElementById("image-title");
+        const select = document.getElementById("image-select");
         const winMessage = document.getElementById("win-message");
 
         let piecesPlaced = 0;
-        let currentImg = null;
 
-        // Función para elegir una imagen al azar sin repetir la actual
-        function selectRandomImage() {
-            if (repository.length === 0) return;
-            
-            // Si solo hay una imagen, usamos esa
-            if (repository.length === 1) {
-                currentImg = repository[0];
-            } else {
-                // Filtrar el repositorio para quitar la imagen que está jugando ahora
-                const availableImages = repository.filter(img => img !== currentImg);
-                // Elegir una al azar de las disponibles
-                const randomIndex = Math.floor(Math.random() * availableImages.length);
-                currentImg = availableImages[randomIndex];
-            }
-
-            // Mostrar el nombre de la foto elegida en la pantalla
-            imageTitle.textContent = `Estás jugando: ${currentImg.name}`;
-            initPuzzle();
-        }
+        // Rellenar el selector con el repositorio de fotos
+        repository.forEach(img => {
+            let option = document.createElement("option");
+            option.value = img.url;
+            option.textContent = img.name;
+            select.appendChild(option);
+        });
 
         function initPuzzle() {
             board.innerHTML = "";
@@ -185,9 +163,7 @@
             winMessage.style.display = "none";
             piecesPlaced = 0;
 
-            if (!currentImg) return;
-            
-            const currentImgUrl = currentImg.url;
+            const currentImgUrl = select.value;
             let piecesArray = [];
 
             for (let r = 0; r < ROWS; r++) {
@@ -275,3 +251,25 @@
 
                 const currentX = parseFloat(el.style.left);
                 const currentY = parseFloat(el.style.top);
+                const targetX = parseFloat(el.dataset.correctX);
+                const targetY = parseFloat(el.dataset.correctY);
+
+                if (Math.abs(currentX - targetX) < 35 && Math.abs(currentY - targetY) < 35) {
+                    el.style.left = `${targetX}px`;
+                    el.style.top = `${targetY}px`;
+                    el.dataset.locked = "true";
+                    el.style.cursor = "default";
+                    el.style.boxShadow = "none";
+                    piecesPlaced++;
+                    if (piecesPlaced === TOTAL_PIECES) winMessage.style.display = "block";
+                } else {
+                    el.classList.add('in-pool');
+                    pool.appendChild(el);
+                }
+            }
+        }
+
+        window.onload = initPuzzle;
+    </script>
+</body>
+</html>

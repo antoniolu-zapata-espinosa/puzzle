@@ -1,0 +1,6 @@
+{
+  "appId": "com.puzzle.hija",
+  "appName": "Puzzle Sorpresa",
+  "webDir": ".",
+  "bundledWebRuntime": false
+}
