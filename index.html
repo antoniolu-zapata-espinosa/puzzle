@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>¡Mi Rompecabezas Divertido!</title>
+    <!-- Vinculación con el archivo de la aplicación -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <style>
+        body {
+            font-family: 'Arial Round', 'Comic Sans MS', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            user-select: none;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-size: 2rem;
+            margin: 5px 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px #2E7D32;
+        }
+        button:active {
+            box-shadow: 0 2px #2E7D32;
+            transform: translateY(2px);
+        }
+
+        /* Botón dinámico para instalar la App */
+        #btnInstall {
+            display: none;
+            background-color: #FF9800;
+            box-shadow: 0 4px #E65100;
+        }
+
+        #puzzle-container {
+            position: relative;
+            width: 320px;
+            height: 400px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 6px solid #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .piece {
+            position: absolute;
+            width: 80px;  /* 320px / 4 col */
+            height: 80px; /* 400px / 5 filas */
+            box-sizing: border-box;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        #win-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 10;
+            width: 80%;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>¡Rompecabezas Mágico!</h1>
+
+    <div class="controls">
+        <button id="musicBtn" onclick="toggleMusic()">🎵 Música</button>
+        <!-- Este botón solo aparece si el dispositivo permite instalar la app -->
+        <button id="btnInstall">📲 Instalar App</button>
+    </div>
+
+    <div id="puzzle-container"></div>
+
+    <div id="win-message" id="winMessage">
+        <h2>¡Felicidades! 🎉🌟</h2>
+        <p>¡Lo lograste!</p>
+        <button onclick="restartGame()" style="background-color: #FF4081; box-shadow: 0 4px #C2185B;">Jugar de nuevo</button>
+    </div>
+
+    <audio id="bgMusic" loop src="https://soundhelix.com"></audio>
+
+    <script>
+        // Registrar el Service Worker para habilitar el modo App
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
+        }
+
+        // Detectar si se puede instalar la aplicación como App nativa
+        let deferredPrompt;
+        const btnInstall = document.getElementById('btnInstall');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            btnInstall.style.display = 'block';
+        });
+
+        btnInstall.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') btnInstall.style.display = 'none';
+                deferredPrompt = null;
+            }
+        });
+
+        // LÓGICA DEL JUEGO
+        const IMAGE_URL = 'https://unsplash.com';
+        const COLS = 4; const ROWS = 5; const TOTAL_PIECES = 20;
+        const PIECE_WIDTH = 80; const PIECE_HEIGHT = 80;
+
+        let pieces = [];
+        let emptyPiece = { col: 3, row: 4 };
+        const container = document.getElementById('puzzle-container');
+        const music = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        const winMessage = document.getElementById('win-message');
+
+        function initGame() {
+            pieces = [];
+            container.innerHTML = '';
+            winMessage.style.display = 'none';
+
+            for (let i = 0; i < TOTAL_PIECES; i++) {
+                let col = i % COLS;
+                let row = Math.floor(i / COLS);
+                if (col === 3 && row === 4) continue;
+
+                let piece = document.createElement('div');
+                piece.className = 'piece';
+                piece.style.backgroundImage = `url('${IMAGE_URL}')`;
+                piece.style.backgroundSize = '320px 400px';
+                piece.style.backgroundPosition = `-${col * PIECE_WIDTH}px -${row * PIECE_HEIGHT}px`;
+                
+                piece.dataset.correctCol = col; piece.dataset.correctRow = row;
+                piece.dataset.currentCol = col; piece.dataset.currentRow = row;
+
+                // Eventos tanto para clic como para toques táctiles en pantallas móviles
+                piece.addEventListener('click', () => movePiece(piece));
+                piece.addEventListener('touchstart', (e) => { e.preventDefault(); movePiece(piece); });
+                
+                pieces.push(piece);
+                container.appendChild(piece);
+            }
+            emptyPiece = { col: 3, row: 4 };
+            shuffle();
+            updatePositions();
+        }
+
+        function updatePositions() {
+            pieces.forEach(piece => {
+                piece.style.left = `${piece.dataset.currentCol * PIECE_WIDTH}px`;
+                piece.style.top = `${piece.dataset.currentRow * PIECE_HEIGHT}px`;
+            });
+        }
+
+        function movePiece(piece) {
+            let col = parseInt(piece.dataset.currentCol);
+            let row = parseInt(piece.dataset.currentRow);
+            let isAdjacent = (Math.abs(col - emptyPiece.col) === 1 && row === emptyPiece.row) ||
+                             (Math.abs(row - emptyPiece.row) === 1 && col === emptyPiece.col);
+
+            if (isAdjacent) {
+                piece.dataset.currentCol = emptyPiece.col;
+                piece.dataset.currentRow = emptyPiece.row;
+                emptyPiece.col = col;
+                emptyPiece.row = row;
+                updatePositions();
+                checkWin();
+            }
+        }
+
+        function shuffle() {
+            for (let i = 0; i < 100; i++) {
+                let validMoves = pieces.filter(piece => {
+                    let col = parseInt(piece.dataset.currentCol);
+                    let row = parseInt(piece.dataset.currentRow);
+                    return (Math.abs(col - emptyPiece.col) === 1 && row === emptyPiece.row) ||
+                           (Math.abs(row - emptyPiece.row) === 1 && col === emptyPiece.col);
+                });
+                let randomPiece = validMoves[Math.floor(Math.random() * validMoves.length)];
+                let tempCol = parseInt(randomPiece.dataset.currentCol);
+                let tempRow = parseInt(randomPiece.dataset.currentRow);
+                randomPiece.dataset.currentCol = emptyPiece.col;
+                randomPiece.dataset.currentRow = emptyPiece.row;
+                emptyPiece.col = tempCol;
+                emptyPiece.row = tempRow;
+            }
+        }
+
+        function checkWin() {
+            let isWin = pieces.every(p => p.dataset.correctCol === p.dataset.currentCol && p.dataset.correctRow === p.dataset.currentRow);
+            if (isWin) winMessage.style.display = 'block';
+        }
+
+        function toggleMusic() {
+            if (music.paused) {
+                music.play();
+                musicBtn.innerText = "⏸ Pausa";
+            } else {
+                music.pause();
+                musicBtn.innerText = "🎵 Música";
+            }
+        }
+
+        function restartGame() { initGame(); }
+        window.onload = initGame;
+    </script>
+</body>
+</html>
