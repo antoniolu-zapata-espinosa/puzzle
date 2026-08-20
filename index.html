@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>¡Mi Rompecabezas Divertido!</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <style>
@@ -155,7 +155,6 @@
         <button onclick="restartGame()" style="background-color: #FF4081; box-shadow: 0 4px #C2185B;">Jugar de nuevo</button>
     </div>
 
-    <!-- AUDIO DE FONDO Y EFECTOS DE SONIDO -->
     <audio id="bgMusic" loop src="https://soundhelix.com"></audio>
     <audio id="clickSound" src="https://mixkit.co" preload="auto"></audio>
     <audio id="successSound" src="https://mixkit.co" preload="auto"></audio>
@@ -179,6 +178,10 @@
             }
         });
 
+        // -------------------------------------------------------------
+        // CONFIGURACIÓN DE TU LISTA DE IMÁGENES
+        // Cambia 'paisaje.jpg' por el nombre de tu foto real si es distinto
+        // -------------------------------------------------------------
         // LISTA DE IMÁGENES (Asegúrate de tener estos archivos subidos en tu GitHub)
         const IMAGES_LIST = [
             'blueycolumpio.jpg',
@@ -199,12 +202,12 @@
         const musicBtn = document.getElementById('musicBtn');
         const winMessage = document.getElementById('win-message');
         
-        // Elementos de efectos de sonido
         const clickSound = document.getElementById('clickSound');
         const successSound = document.getElementById('successSound');
 
         let piecesPlacedCount = 0;
 
+        // ESTA FUNCIÓN AHORA SÍ ESTÁ PERFECTAMENTE DEFINIDA
         function changeImage() {
             currentImageIndex = (currentImageIndex + 1) % IMAGES_LIST.length;
             initGame();
@@ -256,7 +259,6 @@
                 if (piece.classList.contains('placed')) return;
                 isDragging = true;
                 
-                // REPRODUCIR SONIDO AL TOCAR/MOVER LA FICHA
                 clickSound.currentTime = 0;
                 clickSound.play().catch(o => {});
 
@@ -285,7 +287,5 @@
                 let x = clientX - boardRect.left - startX;
                 let y = clientY - boardRect.top - startY;
 
-                piece.style.left = `${x}px`;
-                piece.style.top = `${y}px`;
-            }
+
 
