@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>¡Mi Rompecabezas Divertido!</title>
-    <!-- Vinculación con el archivo de la aplicación -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,7 +11,7 @@
     <style>
         body {
             font-family: 'Arial Round', 'Comic Sans MS', sans-serif;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%);
             margin: 0;
             padding: 10px;
             display: flex;
@@ -21,21 +20,22 @@
             justify-content: center;
             min-height: 100vh;
             user-select: none;
-            overflow: hidden;
             box-sizing: border-box;
         }
 
         h1 {
             color: #fff;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            font-size: 2rem;
-            margin: 5px 0;
+            font-size: 1.8rem;
+            margin: 5px 0 10px 0;
         }
 
         .controls {
             display: flex;
             gap: 10px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         button {
@@ -53,32 +53,68 @@
             transform: translateY(2px);
         }
 
-        /* Botón dinámico para instalar la App */
+        #changeImgBtn {
+            background-color: #00BCD4;
+            box-shadow: 0 4px #0097A7;
+        }
+        #changeImgBtn:active {
+            box-shadow: 0 2px #0097A7;
+        }
+
         #btnInstall {
             display: none;
             background-color: #FF9800;
             box-shadow: 0 4px #E65100;
         }
 
-        #puzzle-container {
+        .game-zone {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 100%;
+        }
+
+        .board-box {
             position: relative;
             width: 320px;
             height: 400px;
-            background-color: rgba(255, 255, 255, 0.5);
+            background-color: rgba(255, 255, 255, 0.4);
             border: 6px solid #fff;
             border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        #target-board {
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.3) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.3) 1px, transparent 1px);
+            background-size: 80px 80px;
         }
 
         .piece {
             position: absolute;
-            width: 80px;  /* 320px / 4 col */
-            height: 80px; /* 400px / 5 filas */
+            width: 80px;  
+            height: 80px; 
             box-sizing: border-box;
-            border: 2px solid #fff;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 6px;
+            cursor: grab;
+            touch-action: none; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        .piece:active {
+            cursor: grabbing;
+            z-index: 1000;
+            transform: scale(1.05);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.3);
+        }
+
+        .piece.placed {
+            border: none;
+            box-shadow: none;
+            cursor: default;
+            pointer-events: none;
         }
 
         #win-message {
@@ -92,7 +128,7 @@
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             text-align: center;
-            z-index: 10;
+            z-index: 2000;
             width: 80%;
             max-width: 300px;
         }
@@ -104,35 +140,36 @@
 
     <div class="controls">
         <button id="musicBtn" onclick="toggleMusic()">🎵 Música</button>
-        <!-- Este botón solo aparece si el dispositivo permite instalar la app -->
+        <button id="changeImgBtn" onclick="changeImage()">🖼️ Cambiar Foto</button>
         <button id="btnInstall">📲 Instalar App</button>
     </div>
 
-    <div id="puzzle-container"></div>
+    <div class="game-zone">
+        <div id="source-board" class="board-box"></div>
+        <div id="target-board" class="board-box"></div>
+    </div>
 
-    <div id="win-message" id="winMessage">
+    <div id="win-message">
         <h2>¡Felicidades! 🎉🌟</h2>
-        <p>¡Lo lograste!</p>
+        <p>¡Completaste el puzzle!</p>
         <button onclick="restartGame()" style="background-color: #FF4081; box-shadow: 0 4px #C2185B;">Jugar de nuevo</button>
     </div>
 
+    <!-- AUDIO DE FONDO Y EFECTOS DE SONIDO -->
     <audio id="bgMusic" loop src="https://soundhelix.com"></audio>
+    <audio id="clickSound" src="https://mixkit.co" preload="auto"></audio>
+    <audio id="successSound" src="https://mixkit.co" preload="auto"></audio>
 
     <script>
-        // Registrar el Service Worker para habilitar el modo App
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
         }
 
-        // Detectar si se puede instalar la aplicación como App nativa
         let deferredPrompt;
         const btnInstall = document.getElementById('btnInstall');
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            btnInstall.style.display = 'block';
+            e.preventDefault(); deferredPrompt = e; btnInstall.style.display = 'block';
         });
-
         btnInstall.addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
@@ -142,107 +179,110 @@
             }
         });
 
-        // LÓGICA DEL JUEGO
-        const IMAGE_URL = 'blueyfamilia.jpg';
+        // LISTA DE IMÁGENES (Asegúrate de tener estos archivos subidos en tu GitHub)
+        const IMAGES_LIST = [
+            'paisaje.jpg',
+            'dibujo.png',
+            'animales.jpg'
+        ]; 
+
+        let currentImageIndex = 0;
         const COLS = 4; const ROWS = 5; const TOTAL_PIECES = 20;
         const PIECE_WIDTH = 80; const PIECE_HEIGHT = 80;
-
-        let pieces = [];
-        let emptyPiece = { col: 3, row: 4 };
-        const container = document.getElementById('puzzle-container');
+        
+        const sourceBoard = document.getElementById('source-board');
+        const targetBoard = document.getElementById('target-board');
         const music = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicBtn');
         const winMessage = document.getElementById('win-message');
+        
+        // Elementos de efectos de sonido
+        const clickSound = document.getElementById('clickSound');
+        const successSound = document.getElementById('successSound');
+
+        let piecesPlacedCount = 0;
+
+        function changeImage() {
+            currentImageIndex = (currentImageIndex + 1) % IMAGES_LIST.length;
+            initGame();
+        }
 
         function initGame() {
-            pieces = [];
-            container.innerHTML = '';
+            sourceBoard.innerHTML = '';
+            targetBoard.innerHTML = ''; 
             winMessage.style.display = 'none';
+            piecesPlacedCount = 0;
 
-            for (let i = 0; i < TOTAL_PIECES; i++) {
-                let col = i % COLS;
-                let row = Math.floor(i / COLS);
-                if (col === 3 && row === 4) continue;
+            let currentImage = IMAGES_LIST[currentImageIndex];
 
-                let piece = document.createElement('div');
-                piece.className = 'piece';
-                piece.style.backgroundImage = `url('${IMAGE_URL}')`;
-                piece.style.backgroundSize = '320px 400px';
-                piece.style.backgroundPosition = `-${col * PIECE_WIDTH}px -${row * PIECE_HEIGHT}px`;
+            let positions = [];
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    positions.push({ x: c * PIECE_WIDTH, y: r * PIECE_HEIGHT });
+                }
+            }
+            positions.sort(() => Math.random() - 0.5);
+
+            let index = 0;
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    let piece = document.createElement('div');
+                    piece.className = 'piece';
+                    piece.style.backgroundImage = `url('${currentImage}')`;
+                    piece.style.backgroundSize = '320px 400px';
+                    piece.style.backgroundPosition = `-${c * PIECE_WIDTH}px -${r * PIECE_HEIGHT}px`;
+                    
+                    let targetX = c * PIECE_WIDTH;
+                    let targetY = r * PIECE_HEIGHT;
+
+                    let startPos = positions[index++];
+                    piece.style.left = `${startPos.x}px`;
+                    piece.style.top = `${startPos.y}px`;
+
+                    makeDraggable(piece, targetX, targetY);
+                    sourceBoard.appendChild(piece);
+                }
+            }
+        }
+
+        function makeDraggable(piece, targetX, targetY) {
+            let isDragging = false;
+            let startX, startY;
+
+            function dragStart(e) {
+                if (piece.classList.contains('placed')) return;
+                isDragging = true;
                 
-                piece.dataset.correctCol = col; piece.dataset.correctRow = row;
-                piece.dataset.currentCol = col; piece.dataset.currentRow = row;
+                // REPRODUCIR SONIDO AL TOCAR/MOVER LA FICHA
+                clickSound.currentTime = 0;
+                clickSound.play().catch(o => {});
 
-                // Eventos tanto para clic como para toques táctiles en pantallas móviles
-                piece.addEventListener('click', () => movePiece(piece));
-                piece.addEventListener('touchstart', (e) => { e.preventDefault(); movePiece(piece); });
+                let clientX = e.type === 'touchstart' ? e.touches.clientX : e.clientX;
+                let clientY = e.type === 'touchstart' ? e.touches.clientY : e.clientY;
                 
-                pieces.push(piece);
-                container.appendChild(piece);
+                let rect = piece.getBoundingClientRect();
+                startX = clientX - rect.left;
+                startY = clientY - rect.top;
+                
+                piece.style.transition = 'none';
+                document.addEventListener('mousemove', dragMove, { passive: false });
+                document.addEventListener('touchmove', dragMove, { passive: false });
+                document.addEventListener('mouseup', dragEnd);
+                document.addEventListener('touchend', dragEnd);
             }
-            emptyPiece = { col: 3, row: 4 };
-            shuffle();
-            updatePositions();
-        }
 
-        function updatePositions() {
-            pieces.forEach(piece => {
-                piece.style.left = `${piece.dataset.currentCol * PIECE_WIDTH}px`;
-                piece.style.top = `${piece.dataset.currentRow * PIECE_HEIGHT}px`;
-            });
-        }
+            function dragMove(e) {
+                if (!isDragging) return;
+                e.preventDefault(); 
+                
+                let clientX = e.type === 'touchmove' ? e.touches.clientX : e.clientX;
+                let clientY = e.type === 'touchmove' ? e.touches.clientY : e.clientY;
 
-        function movePiece(piece) {
-            let col = parseInt(piece.dataset.currentCol);
-            let row = parseInt(piece.dataset.currentRow);
-            let isAdjacent = (Math.abs(col - emptyPiece.col) === 1 && row === emptyPiece.row) ||
-                             (Math.abs(row - emptyPiece.row) === 1 && col === emptyPiece.col);
+                let boardRect = sourceBoard.getBoundingClientRect();
+                let x = clientX - boardRect.left - startX;
+                let y = clientY - boardRect.top - startY;
 
-            if (isAdjacent) {
-                piece.dataset.currentCol = emptyPiece.col;
-                piece.dataset.currentRow = emptyPiece.row;
-                emptyPiece.col = col;
-                emptyPiece.row = row;
-                updatePositions();
-                checkWin();
+                piece.style.left = `${x}px`;
+                piece.style.top = `${y}px`;
             }
-        }
 
-        function shuffle() {
-            for (let i = 0; i < 100; i++) {
-                let validMoves = pieces.filter(piece => {
-                    let col = parseInt(piece.dataset.currentCol);
-                    let row = parseInt(piece.dataset.currentRow);
-                    return (Math.abs(col - emptyPiece.col) === 1 && row === emptyPiece.row) ||
-                           (Math.abs(row - emptyPiece.row) === 1 && col === emptyPiece.col);
-                });
-                let randomPiece = validMoves[Math.floor(Math.random() * validMoves.length)];
-                let tempCol = parseInt(randomPiece.dataset.currentCol);
-                let tempRow = parseInt(randomPiece.dataset.currentRow);
-                randomPiece.dataset.currentCol = emptyPiece.col;
-                randomPiece.dataset.currentRow = emptyPiece.row;
-                emptyPiece.col = tempCol;
-                emptyPiece.row = tempRow;
-            }
-        }
-
-        function checkWin() {
-            let isWin = pieces.every(p => p.dataset.correctCol === p.dataset.currentCol && p.dataset.correctRow === p.dataset.currentRow);
-            if (isWin) winMessage.style.display = 'block';
-        }
-
-        function toggleMusic() {
-            if (music.paused) {
-                music.play();
-                musicBtn.innerText = "⏸ Pausa";
-            } else {
-                music.pause();
-                musicBtn.innerText = "🎵 Música";
-            }
-        }
-
-        function restartGame() { initGame(); }
-        window.onload = initGame;
-    </script>
-</body>
-</html>
