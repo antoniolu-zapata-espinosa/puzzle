@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>¡Mi Rompecabezas Divertido!</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>¡Mi Rompecabezas Mágico!</title>
     
     <style>
+        /* Fondo infantil colorido con diseño de nubes */
         body {
             font-family: 'Arial Round', 'Comic Sans MS', sans-serif;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%);
+            background: #87CEEB; /* Azul cielo */
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) 50%, transparent 60%),
+                radial-gradient(circle at 35% 40%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) 50%, transparent 60%),
+                radial-gradient(circle at 75% 20%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) 50%, transparent 60%),
+                radial-gradient(circle at 85% 30%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) 50%, transparent 60%);
+            background-size: 400px 400px;
             margin: 0;
             padding: 10px;
             display: flex;
@@ -25,91 +29,88 @@
 
         h1 {
             color: #fff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            font-size: 1.8rem;
-            margin: 5px 0 10px 0;
+            text-shadow: 3px 3px 0px #FF4081, -1px -1px 0px #FF4081, 1px -1px 0px #FF4081, -1px 1px 0px #FF4081;
+            font-size: 2.2rem;
+            margin: 5px 0 15px 0;
+            letter-spacing: 2px;
         }
 
         .controls {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         button {
             background-color: #4CAF50;
             color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 0.9rem;
-            border-radius: 20px;
+            border: 3px solid #fff;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 25px;
             cursor: pointer;
-            box-shadow: 0 4px #2E7D32;
+            box-shadow: 0 6px #2E7D32;
+            transition: all 0.1s ease;
         }
         button:active {
             box-shadow: 0 2px #2E7D32;
-            transform: translateY(2px);
+            transform: translateY(4px);
         }
 
         #changeImgBtn {
             background-color: #00BCD4;
-            box-shadow: 0 4px #0097A7;
-        }
-        #changeImgBtn:active {
-            box-shadow: 0 2px #0097A7;
+            box-shadow: 0 6px #0097A7;
         }
 
-        #btnInstall {
-            display: none;
-            background-color: #FF9800;
-            box-shadow: 0 4px #E65100;
-        }
-
+        /* Zona de juego: Coloca los dos tableros uno al lado del otro */
         .game-zone {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
+            gap: 25px;
             max-width: 100%;
         }
 
+        /* Caja de los dos tableros */
         .board-box {
             position: relative;
             width: 320px;
             height: 400px;
-            background-color: rgba(255, 255, 255, 0.4);
-            border: 6px solid #fff;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 8px solid #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         }
 
+        /* Guías visuales del tablero destino */
         #target-board {
             background-image: 
-                linear-gradient(to right, rgba(255,255,255,0.3) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255,255,255,0.3) 1px, transparent 1px);
+                linear-gradient(to right, rgba(255,255,255,0.4) 2px, transparent 2px),
+                linear-gradient(to bottom, rgba(255,255,255,0.4) 2px, transparent 2px);
             background-size: 80px 80px;
         }
 
+        /* Estilo de las piezas */
         .piece {
             position: absolute;
-            width: 80px;  
-            height: 80px; 
+            width: 80px;  /* 320px / 4 columnas */
+            height: 80px; /* 400px / 5 filas */
             box-sizing: border-box;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 6px;
+            border: 1.5px solid rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
             cursor: grab;
             touch-action: none; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            box-shadow: 0 5px 8px rgba(0,0,0,0.2);
         }
         .piece:active {
             cursor: grabbing;
-            z-index: 1000;
-            transform: scale(1.05);
-            box-shadow: 0 8px 12px rgba(0,0,0,0.3);
+            z-index: 999;
+            transform: scale(1.08);
+            box-shadow: 0 12px 16px rgba(0,0,0,0.3);
         }
 
+        /* Cuando la pieza ya encajó */
         .piece.placed {
             border: none;
             box-shadow: none;
@@ -117,6 +118,7 @@
             pointer-events: none;
         }
 
+        /* Cartel de ganar */
         #win-message {
             display: none;
             position: fixed;
@@ -124,72 +126,64 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: white;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            padding: 30px;
+            border-radius: 25px;
+            border: 5px solid #FF4081;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
             text-align: center;
-            z-index: 2000;
+            z-index: 9999;
             width: 80%;
-            max-width: 300px;
+            max-width: 320px;
+        }
+        #win-message h2 {
+            color: #FF4081;
+            font-size: 2.2rem;
+            margin: 0 0 15px 0;
         }
     </style>
 </head>
 <body>
 
-    <h1>¡Rompecabezas Mágico!</h1>
+    <h1>✨ ¡Puzzle Mágico! ✨</h1>
 
     <div class="controls">
-        <button id="musicBtn" onclick="toggleMusic()">🎵 Música</button>
+        <button id="musicBtn" onclick="toggleMusic()">🎵 Música: NO</button>
         <button id="changeImgBtn" onclick="changeImage()">🖼️ Cambiar Foto</button>
-        <button id="btnInstall">📲 Instalar App</button>
     </div>
 
     <div class="game-zone">
+        <!-- Izquierda: Piezas desordenadas -->
         <div id="source-board" class="board-box"></div>
+        <!-- Derecha: Destino vacío -->
         <div id="target-board" class="board-box"></div>
     </div>
 
+    <!-- Mensaje de victoria -->
     <div id="win-message">
         <h2>¡Felicidades! 🎉🌟</h2>
-        <p>¡Completaste el puzzle!</p>
-        <button onclick="restartGame()" style="background-color: #FF4081; box-shadow: 0 4px #C2185B;">Jugar de nuevo</button>
+        <p style="font-size: 1.2rem; color: #555;">¡Lo lograste genial!</p>
+        <button onclick="restartGame()" style="background-color: #FF4081; box-shadow: 0 6px #C2185B;">Jugar otra vez</button>
     </div>
 
+    <!-- SONIDOS Y MÚSICA -->
     <audio id="bgMusic" loop src="https://soundhelix.com"></audio>
     <audio id="clickSound" src="https://mixkit.co" preload="auto"></audio>
     <audio id="successSound" src="https://mixkit.co" preload="auto"></audio>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
-        }
-
-        let deferredPrompt;
-        const btnInstall = document.getElementById('btnInstall');
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); deferredPrompt = e; btnInstall.style.display = 'block';
-        });
-        btnInstall.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') btnInstall.style.display = 'none';
-                deferredPrompt = null;
-            }
-        });
-
-        // -------------------------------------------------------------
-        // CONFIGURACIÓN DE TU LISTA DE IMÁGENES
-        // Cambia 'paisaje.jpg' por el nombre de tu foto real si es distinto
-        // -------------------------------------------------------------
-        // LISTA DE IMÁGENES (Asegúrate de tener estos archivos subidos en tu GitHub)
+        // =============================================================
+        // CONFIGURACIÓN DE TUS IMÁGENES DE GITHUB
+        // Reemplaza los nombres de abajo por los nombres exactos de tus fotos.
+        // He dejado una de internet al final como "imagen de seguridad".
+        // =============================================================
         const IMAGES_LIST = [
             'blueycolumpio.jpg',
             'blueyfamilia.jpg',
             'blueyparque.jpg',
             'blueyvolando.jpg',
             'peppapig.jpg',
-            'spideyamigos.jpg'
+            'spideyamigos.jpg',
+            'https://unsplash.com'
         ]; 
 
         let currentImageIndex = 0;
@@ -207,7 +201,6 @@
 
         let piecesPlacedCount = 0;
 
-        // ESTA FUNCIÓN AHORA SÍ ESTÁ PERFECTAMENTE DEFINIDA
         function changeImage() {
             currentImageIndex = (currentImageIndex + 1) % IMAGES_LIST.length;
             initGame();
@@ -221,6 +214,7 @@
 
             let currentImage = IMAGES_LIST[currentImageIndex];
 
+            // Generar cuadrícula de posiciones aleatorias para el tablero izquierdo
             let positions = [];
             for (let r = 0; r < ROWS; r++) {
                 for (let c = 0; c < COLS; c++) {
@@ -279,13 +273,8 @@
             function dragMove(e) {
                 if (!isDragging) return;
                 e.preventDefault(); 
-                
-                let clientX = e.type === 'touchmove' ? e.touches.clientX : e.clientX;
-                let clientY = e.type === 'touchmove' ? e.touches.clientY : e.clientY;
+            
 
-                let boardRect = sourceBoard.getBoundingClientRect();
-                let x = clientX - boardRect.left - startX;
-                let y = clientY - boardRect.top - startY;
 
 
 
