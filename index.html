@@ -1,287 +1,671 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>¡Mi Rompecabezas Mágico!</title>
-    
-    <style>
-        /* Fondo infantil con nubes pintadas por código */
-        body {
-            font-family: 'Arial Round', 'Comic Sans MS', sans-serif;
-            background: #87CEEB;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) 50%, transparent 60%),
-                radial-gradient(circle at 35% 40%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) 50%, transparent 60%),
-                radial-gradient(circle at 75% 20%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) 50%, transparent 60%),
-                radial-gradient(circle at 85% 30%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.8) 50%, transparent 60%);
-            background-size: 400px 400px;
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            user-select: none;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        h1 {
-            color: #fff;
-            text-shadow: 3px 3px 0px #FF4081, -1px -1px 0px #FF4081, 1px -1px 0px #FF4081, -1px 1px 0px #FF4081;
-            font-size: 2.2rem;
-            margin: 5px 0 15px 0;
-        }
+<title>Puzzle infantil</title>
 
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+<style>
 
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: 3px solid #fff;
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 25px;
-            cursor: pointer;
-            box-shadow: 0 6px #2E7D32;
-            transition: all 0.1s ease;
-        }
-        button:active {
-            box-shadow: 0 2px #2E7D32;
-            transform: translateY(4px);
-        }
+* {
+    box-sizing: border-box;
+}
 
-        #changeImgBtn {
-            background-color: #00BCD4;
-            box-shadow: 0 6px #0097A7;
-        }
+body {
+    margin: 0;
+    padding: 20px;
 
-        .game-zone {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 25px;
-            max-width: 100%;
-        }
+    font-family: Arial, sans-serif;
 
-        .board-box {
-            position: relative;
-            width: 320px;
-            height: 400px;
-            background-color: rgba(255, 255, 255, 0.5);
-            border: 8px solid #fff;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
+    background:
+        radial-gradient(circle at 10% 15%, #ffe89a 0 45px, transparent 46px),
+        radial-gradient(circle at 90% 20%, #ffc5dc 0 55px, transparent 56px),
+        radial-gradient(circle at 15% 85%, #bfe9ff 0 55px, transparent 56px),
+        radial-gradient(circle at 90% 85%, #d6f3c8 0 50px, transparent 51px),
+        linear-gradient(135deg, #e5f8ff, #fff1f7);
 
-        #target-board {
-            background-image: 
-                linear-gradient(to right, rgba(255,255,255,0.4) 2px, transparent 2px),
-                linear-gradient(to bottom, rgba(255,255,255,0.4) 2px, transparent 2px);
-            background-size: 80px 80px;
-        }
+    min-height: 100vh;
+}
 
-        .piece {
-            position: absolute;
-            width: 80px;  
-            height: 80px; 
-            box-sizing: border-box;
-            border: 1.5px solid rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            cursor: grab;
-            touch-action: none; 
-            box-shadow: 0 5px 8px rgba(0,0,0,0.2);
-        }
-        .piece:active {
-            cursor: grabbing;
-            z-index: 999;
-            transform: scale(1.08);
-            box-shadow: 0 12px 16px rgba(0,0,0,0.3);
-        }
+.contenedor {
+    max-width: 1100px;
+    margin: auto;
 
-        .piece.placed {
-            border: none;
-            box-shadow: none;
-            cursor: default;
-            pointer-events: none;
-        }
+    background: rgba(255,255,255,0.94);
 
-        #win-message {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px;
-            border-radius: 25px;
-            border: 5px solid #FF4081;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-            text-align: center;
-            z-index: 9999;
-            width: 80%;
-            max-width: 320px;
-        }
-        #win-message h2 {
-            color: #FF4081;
-            font-size: 2.2rem;
-            margin: 0 0 15px 0;
-        }
-    </style>
+    border-radius: 30px;
+
+    padding: 25px;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.15);
+}
+
+h1 {
+    text-align: center;
+    color: #555;
+
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.juego {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    gap: 25px;
+}
+
+.panel {
+    background: #f8fbff;
+
+    border-radius: 22px;
+
+    padding: 15px;
+}
+
+.titulo {
+    text-align: center;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    color: #555;
+
+    margin-bottom: 12px;
+}
+
+
+/* =========================
+   IMAGEN DE REFERENCIA
+========================= */
+
+#referencia {
+    width: 100%;
+
+    aspect-ratio: 1 / 1;
+
+    border-radius: 15px;
+
+    background-size: cover;
+
+    background-position: center;
+
+    box-shadow:
+        0 3px 8px rgba(0,0,0,0.12);
+}
+
+
+/* =========================
+   TABLERO
+========================= */
+
+#tablero {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 1fr);
+
+    gap: 3px;
+
+    background: white;
+
+    padding: 5px;
+
+    border-radius: 15px;
+
+    aspect-ratio: 1 / 1;
+}
+
+
+/* =========================
+   HUECOS
+========================= */
+
+.hueco {
+
+    position: relative;
+
+    min-width: 0;
+
+    aspect-ratio: 1 / 1;
+
+    background: #edf2f6;
+
+    border:
+        2px dashed
+        #c7d0d8;
+
+    border-radius: 6px;
+}
+
+.hueco.correcto {
+
+    border:
+        2px solid
+        #8bcf82;
+
+    background: #effbea;
+}
+
+
+/* =========================
+   PIEZAS
+========================= */
+
+.pieza {
+
+    position: absolute;
+
+    left: 2px;
+    top: 2px;
+
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+
+    border-radius: 5px;
+
+    cursor: grab;
+
+    background-repeat: no-repeat;
+
+    box-shadow:
+        0 2px 5px rgba(0,0,0,0.25);
+
+    touch-action: none;
+
+    user-select: none;
+
+    transition:
+        transform 0.12s,
+        box-shadow 0.12s;
+
+    z-index: 2;
+}
+
+.pieza:active {
+    cursor: grabbing;
+}
+
+.pieza.arrastrando {
+
+    transform:
+        scale(1.08);
+
+    box-shadow:
+        0 8px 18px rgba(0,0,0,0.30);
+
+    z-index: 1000;
+}
+
+
+/* =========================
+   BOTONES
+========================= */
+
+.controles {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+    margin-top: 25px;
+}
+
+.control {
+
+    border: none;
+
+    padding:
+        13px 22px;
+
+    border-radius: 30px;
+
+    background: #ffd0e4;
+
+    color: #555;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 3px 6px rgba(0,0,0,0.12);
+}
+
+.control:hover {
+
+    transform: scale(1.04);
+}
+
+#mensaje {
+
+    text-align: center;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    color: #666;
+
+    margin-top: 15px;
+
+    min-height: 25px;
+}
+
+
+/* =========================
+   MÓVIL / TABLET
+========================= */
+
+@media (max-width: 700px) {
+
+    .juego {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .contenedor {
+
+        padding: 15px;
+
+    }
+
+    body {
+
+        padding: 10px;
+
+    }
+
+}
+
+</style>
 </head>
+
+
 <body>
 
-    <h1>✨ ¡Puzzle Mágico! ✨</h1>
 
-    <div class="controls">
-        <button id="musicBtn" onclick="toggleMusic()">🎵 Música: NO</button>
-        <button id="changeImgBtn" onclick="changeImage()">🖼️ Cambiar Foto</button>
+<div class="contenedor">
+
+    <h1>
+        🧩 ¡Mi Puzzle! 🌈
+    </h1>
+
+
+    <div class="juego">
+
+
+        <!-- =====================
+             REFERENCIA
+        ====================== -->
+
+        <div class="panel">
+
+            <div class="titulo">
+                🌟 Imagen de referencia
+            </div>
+
+            <div id="referencia"></div>
+
+        </div>
+
+
+        <!-- =====================
+             PUZZLE
+        ====================== -->
+
+        <div class="panel">
+
+            <div class="titulo">
+                🧩 ¡Arrastra las piezas!
+            </div>
+
+            <div id="tablero"></div>
+
+        </div>
+
     </div>
 
-    <div class="game-zone">
-        <div id="source-board" class="board-box"></div>
-        <div id="target-board" class="board-box"></div>
+
+    <div class="controles">
+
+        <button
+            type="button"
+            class="control"
+            id="nuevo">
+
+            🎲 Otra imagen
+
+        </button>
+
+
+        <button
+            type="button"
+            class="control"
+            id="mezclar">
+
+            🔀 Mezclar
+
+        </button>
+
     </div>
 
-    <div id="win-message">
-        <h2>¡Felicidades! 🎉🌟</h2>
-        <p style="font-size: 1.2rem; color: #555;">¡Lo lograste genial!</p>
-        <button onclick="restartGame()" style="background-color: #FF4081; box-shadow: 0 6px #C2185B;">Jugar otra vez</button>
+
+    <div id="mensaje">
+
+        🧩 Arrastra cada pieza hasta su sitio.
+
     </div>
 
-    <script>
-        // =============================================================
-        // CONFIGURACIÓN DE TU LISTA DE IMÁGENES
-        // Coloca primero el nombre de tus imágenes locales subidas en tu GitHub.
-        // He incluido una imagen infantil directa de internet para asegurar
-        // que el juego siempre pinte piezas aunque falle tu archivo local.
-        // =============================================================
-        const IMAGES_LIST = [
-            'blueycolumpio.jpg',
-            'blueyfamilia.jpg',
-            'blueyparque.jpg',
-            'blueyvolando.jpg',
-            'peppapig.jpg',
-            'spideyamigos.jpg',
-            'https://unsplash.com'
-        ]; 
-
-        let currentImageIndex = 0;
-        const COLS = 4; const ROWS = 5; const TOTAL_PIECES = 20;
-        const PIECE_WIDTH = 80; const PIECE_HEIGHT = 80;
-        
-        const sourceBoard = document.getElementById('source-board');
-        const targetBoard = document.getElementById('target-board');
-        const musicBtn = document.getElementById('musicBtn');
-        const winMessage = document.getElementById('win-message');
-        
-        let piecesPlacedCount = 0;
-
-        // --- MOTOR DE AUDIO GENERADO POR CÓDIGO (Inmune a bloqueos) ---
-        let audioCtx = null;
-        let isMusicPlaying = false;
-        let musicInterval = null;
-
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-
-        // Tono corto al levantar o mover una pieza
-        function playClickSound() {
-            initAudio();
-            if (!audioCtx) return;
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(300, audioCtx.currentTime); // Tono medio suave
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-            
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.05);
-        }
-
-        // Tono alegre ascendente (¡Acierto!)
-        function playSuccessSound() {
-            initAudio();
-            if (!audioCtx) return;
-            let now = audioCtx.currentTime;
-            
-            // Primer tono feliz
-            let osc1 = audioCtx.createOscillator();
-            let gain1 = audioCtx.createGain();
-            osc1.connect(gain1); gain1.connect(audioCtx.destination);
-            osc1.frequency.setValueAtTime(523.25, now); // Nota Do
-            gain1.gain.setValueAtTime(0.1, now);
-            gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-            osc1.start(); osc1.stop(now + 0.1);
-
-            // Segundo tono feliz más agudo inmediatamente después
-            setTimeout(() => {
-                let osc2 = audioCtx.createOscillator();
-                let gain2 = audioCtx.createGain();
-                osc2.connect(gain2); gain2.connect(audioCtx.destination);
-                osc2.frequency.setValueAtTime(659.25, audioCtx.currentTime); // Nota Mi
-                gain2.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-                osc2.start(); osc2.stop(audioCtx.currentTime + 0.15);
-            }, 80);
-        }
-
-        // Melodía infantil rítmica cíclica generada por síntesis matemática
-        function startMelody() {
-            const notes = [261.63, 293.66, 329.63, 349.23, 392.00, 392.00, 440.00, 392.00]; // Melodía simple infantil
-            let step = 0;
-            
-            musicInterval = setInterval(() => {
-                if (!isMusicPlaying) return;
-                initAudio();
-                
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                
-                osc.type = 'sine'; // Tono dulce
-                osc.frequency.setValueAtTime(notes[step], audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.03, audioCtx.currentTime); // Volumen bajito de fondo
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-                
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
-                
-                step = (step + 1) % notes.length;
-            }, 400); // Ritmo alegre constante
-        }
-
-        function toggleMusic() {
-            initAudio();
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            if (!isMusicPlaying) {
-                isMusicPlaying = true;
-                musicBtn.innerText = "⏸ Música: SÍ";
-                startMelody();
-            } else {
-                isMusicPlaying = false;
-                musicBtn.innerText = "🎵 Música: NO";
-
-           
-
-            
+</div>
 
 
 
+<script>
 
+
+/* =====================================================
+   TUS IMÁGENES
+=====================================================
+
+   Pon aquí los nombres de tus fotografías.
+
+   Por ejemplo:
+
+   imagenes/perro.jpg
+   imagenes/gato.jpg
+   imagenes/familia.jpg
+
+===================================================== */
+
+const imagenes = [
+
+    "imagenes/blueycolumpio.jpg",
+
+    "imagenes/blueyfamilia.jpg",
+
+    "imagenes/blueyparque.jpg",
+
+    "imagenes/blueyvolando.jpg",
+
+    "imagenes/peppapig.jpg",
+
+    "imagenes/spideyamigos.jpg"
+
+];
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+const referencia =
+    document.getElementById("referencia");
+
+const tablero =
+    document.getElementById("tablero");
+
+const mensaje =
+    document.getElementById("mensaje");
+
+
+let imagenActual = "";
+
+let piezaArrastrada = null;
+
+let huecoOrigen = null;
+
+let desplazamientoX = 0;
+
+let desplazamientoY = 0;
+
+
+/* =====================================================
+   ELEGIR IMAGEN ALEATORIA
+===================================================== */
+
+function elegirImagen() {
+
+    if (imagenes.length === 0) {
+
+        return;
+
+    }
+
+
+    let indice;
+
+    do {
+
+        indice =
+            Math.floor(
+                Math.random() *
+                imagenes.length
+            );
+
+    }
+    while (
+        imagenes.length > 1 &&
+        imagenes[indice] === imagenActual
+    );
+
+
+    imagenActual =
+        imagenes[indice];
+
+}
+
+
+/* =====================================================
+   CREAR UNA PIEZA
+===================================================== */
+
+function crearPieza(posicion) {
+
+    const pieza =
+        document.createElement("div");
+
+
+    pieza.className =
+        "pieza";
+
+
+    pieza.dataset.posicion =
+        posicion;
+
+
+    /*
+       Posición de la imagen.
+
+       Tenemos una cuadrícula 5 x 5.
+    */
+
+    const columna =
+        posicion % 5;
+
+    const fila =
+        Math.floor(posicion / 5);
+
+
+    const x =
+        columna * 25;
+
+    const y =
+        fila * 25;
+
+
+    pieza.style.backgroundImage =
+        `url("${imagenActual}")`;
+
+
+    pieza.style.backgroundSize =
+        "500% 500%";
+
+
+    pieza.style.backgroundPosition =
+        `${x}% ${y}%`;
+
+
+    /*
+       Activar arrastre.
+    */
+
+    pieza.addEventListener(
+        "pointerdown",
+        empezarArrastre
+    );
+
+
+    return pieza;
+
+}
+
+
+/* =====================================================
+   CREAR EL PUZZLE
+===================================================== */
+
+function crearPuzzle() {
+
+    tablero.innerHTML = "";
+
+
+    /*
+       Mostrar imagen completa.
+    */
+
+    referencia.style.backgroundImage =
+        `url("${imagenActual}")`;
+
+
+    /*
+       Crear posiciones 0-24.
+    */
+
+    let posiciones = [];
+
+    for (
+        let i = 0;
+        i < 25;
+        i++
+    ) {
+
+        posiciones.push(i);
+
+    }
+
+
+    /*
+       Mezclar.
+
+       Evitamos que el puzzle aparezca
+       ya terminado.
+    */
+
+    do {
+
+        posiciones.sort(
+            () => Math.random() - 0.5
+        );
+
+    }
+    while (
+        posiciones.every(
+            (valor, indice) =>
+                valor === indice
+        )
+    );
+
+
+    /*
+       Crear 25 huecos.
+    */
+
+    for (
+        let i = 0;
+        i < 25;
+        i++
+    ) {
+
+        const hueco =
+            document.createElement("div");
+
+
+        hueco.className =
+            "hueco";
+
+
+        /*
+           Guardamos cuál es la posición
+           correcta de este hueco.
+        */
+
+        hueco.dataset.posicion =
+            i;
+
+
+        /*
+           Ponemos una pieza aleatoria.
+        */
+
+        const pieza =
+            crearPieza(
+                posiciones[i]
+            );
+
+
+        hueco.appendChild(
+            pieza
+        );
+
+
+        tablero.appendChild(
+            hueco
+        );
+
+    }
+
+
+    comprobarPuzzle();
+
+
+    mensaje.textContent =
+        "🧩 Arrastra cada pieza hasta su sitio.";
+
+}
+
+
+/* =====================================================
+   EMPEZAR A ARRASTRAR
+===================================================== */
+
+function empezarArrastre(evento) {
+
+    evento.preventDefault();
+
+
+    piezaArrastrada =
+        evento.currentTarget;
+
+
+    huecoOrigen =
+        piezaArrastrada.parentElement;
+
+
+    /*
+       Guardamos la posición del
+```
