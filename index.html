@@ -15,6 +15,7 @@
 body {
     margin: 0;
     padding: 20px;
+    min-height: 100vh;
 
     font-family: Arial, sans-serif;
 
@@ -24,15 +25,13 @@ body {
         radial-gradient(circle at 15% 85%, #bfe9ff 0 55px, transparent 56px),
         radial-gradient(circle at 90% 85%, #d6f3c8 0 50px, transparent 51px),
         linear-gradient(135deg, #e5f8ff, #fff1f7);
-
-    min-height: 100vh;
 }
 
 .contenedor {
     max-width: 1100px;
     margin: auto;
 
-    background: rgba(255,255,255,0.94);
+    background: rgba(255,255,255,0.95);
 
     border-radius: 30px;
 
@@ -45,12 +44,63 @@ body {
 h1 {
     text-align: center;
     color: #555;
-
-    margin-top: 0;
-    margin-bottom: 25px;
+    margin: 0 0 20px;
 }
 
+
+/* ==========================
+   ZONA DE FOTOS
+========================== */
+
+.cargar {
+
+    background: #fff7fb;
+
+    border-radius: 20px;
+
+    padding: 15px;
+
+    margin-bottom: 20px;
+
+    text-align: center;
+}
+
+.cargar label {
+
+    display: inline-block;
+
+    padding: 13px 22px;
+
+    background: #ffd0e4;
+
+    border-radius: 30px;
+
+    font-weight: bold;
+
+    color: #555;
+
+    cursor: pointer;
+}
+
+#selectorFotos {
+    display: none;
+}
+
+#contador {
+    margin-top: 10px;
+
+    color: #666;
+
+    font-size: 14px;
+}
+
+
+/* ==========================
+   JUEGO
+========================== */
+
 .juego {
+
     display: grid;
 
     grid-template-columns:
@@ -61,6 +111,7 @@ h1 {
 }
 
 .panel {
+
     background: #f8fbff;
 
     border-radius: 22px;
@@ -69,6 +120,7 @@ h1 {
 }
 
 .titulo {
+
     text-align: center;
 
     font-size: 20px;
@@ -81,11 +133,12 @@ h1 {
 }
 
 
-/* =========================
-   IMAGEN DE REFERENCIA
-========================= */
+/* ==========================
+   REFERENCIA
+========================== */
 
 #referencia {
+
     width: 100%;
 
     aspect-ratio: 1 / 1;
@@ -96,14 +149,13 @@ h1 {
 
     background-position: center;
 
-    box-shadow:
-        0 3px 8px rgba(0,0,0,0.12);
+    background-color: #eee;
 }
 
 
-/* =========================
+/* ==========================
    TABLERO
-========================= */
+========================== */
 
 #tablero {
 
@@ -124,9 +176,9 @@ h1 {
 }
 
 
-/* =========================
+/* ==========================
    HUECOS
-========================= */
+========================== */
 
 .hueco {
 
@@ -155,9 +207,9 @@ h1 {
 }
 
 
-/* =========================
+/* ==========================
    PIEZAS
-========================= */
+========================== */
 
 .pieza {
 
@@ -182,32 +234,23 @@ h1 {
 
     user-select: none;
 
-    transition:
-        transform 0.12s,
-        box-shadow 0.12s;
-
     z-index: 2;
-}
-
-.pieza:active {
-    cursor: grabbing;
 }
 
 .pieza.arrastrando {
 
-    transform:
-        scale(1.08);
+    transform: scale(1.08);
 
     box-shadow:
-        0 8px 18px rgba(0,0,0,0.30);
+        0 8px 18px rgba(0,0,0,0.3);
 
     z-index: 1000;
 }
 
 
-/* =========================
+/* ==========================
    BOTONES
-========================= */
+========================== */
 
 .controles {
 
@@ -226,8 +269,7 @@ h1 {
 
     border: none;
 
-    padding:
-        13px 22px;
+    padding: 13px 22px;
 
     border-radius: 30px;
 
@@ -240,13 +282,9 @@ h1 {
     font-weight: bold;
 
     cursor: pointer;
-
-    box-shadow:
-        0 3px 6px rgba(0,0,0,0.12);
 }
 
 .control:hover {
-
     transform: scale(1.04);
 }
 
@@ -266,28 +304,22 @@ h1 {
 }
 
 
-/* =========================
-   MÓVIL / TABLET
-========================= */
+/* ==========================
+   MÓVIL
+========================== */
 
 @media (max-width: 700px) {
 
-    .juego {
-
-        grid-template-columns: 1fr;
-
+    body {
+        padding: 10px;
     }
 
     .contenedor {
-
         padding: 15px;
-
     }
 
-    body {
-
-        padding: 10px;
-
+    .juego {
+        grid-template-columns: 1fr;
     }
 
 }
@@ -301,17 +333,44 @@ h1 {
 
 <div class="contenedor">
 
+
     <h1>
         🧩 ¡Mi Puzzle! 🌈
     </h1>
 
 
+    <!-- ======================
+         AÑADIR FOTOS
+    ======================= -->
+
+    <div class="cargar">
+
+        <label for="selectorFotos">
+            📸 Añadir mis fotos
+        </label>
+
+        <input
+            id="selectorFotos"
+            type="file"
+            accept="image/*"
+            multiple
+        >
+
+        <div id="contador">
+            Todavía no has añadido fotos.
+        </div>
+
+    </div>
+
+
+    <!-- ======================
+         JUEGO
+    ======================= -->
+
     <div class="juego">
 
 
-        <!-- =====================
-             REFERENCIA
-        ====================== -->
+        <!-- REFERENCIA -->
 
         <div class="panel">
 
@@ -324,9 +383,7 @@ h1 {
         </div>
 
 
-        <!-- =====================
-             PUZZLE
-        ====================== -->
+        <!-- PUZZLE -->
 
         <div class="panel">
 
@@ -340,6 +397,8 @@ h1 {
 
     </div>
 
+
+    <!-- BOTONES -->
 
     <div class="controles">
 
@@ -367,9 +426,10 @@ h1 {
 
     <div id="mensaje">
 
-        🧩 Arrastra cada pieza hasta su sitio.
+        📸 Primero añade algunas fotos.
 
     </div>
+
 
 </div>
 
@@ -379,49 +439,10 @@ h1 {
 
 
 /* =====================================================
-   TUS IMÁGENES
-=====================================================
-
-   Pon aquí los nombres de tus fotografías.
-
-   Por ejemplo:
-
-   imagenes/perro.jpg
-   imagenes/gato.jpg
-   imagenes/familia.jpg
-
+   FOTOS
 ===================================================== */
 
-const imagenes = [
-
-    "imagenes/blueycolumpio.jpg",
-
-    "imagenes/blueyfamilia.jpg",
-
-    "imagenes/blueyparque.jpg",
-
-    "imagenes/blueyvolando.jpg",
-
-    "imagenes/peppapig.jpg",
-
-    "imagenes/spideyamigos.jpg"
-
-];
-
-
-/* =====================================================
-   VARIABLES
-===================================================== */
-
-const referencia =
-    document.getElementById("referencia");
-
-const tablero =
-    document.getElementById("tablero");
-
-const mensaje =
-    document.getElementById("mensaje");
-
+let fotos = [];
 
 let imagenActual = "";
 
@@ -429,49 +450,162 @@ let piezaArrastrada = null;
 
 let huecoOrigen = null;
 
-let desplazamientoX = 0;
 
-let desplazamientoY = 0;
+/* =====================================================
+   ELEMENTOS
+===================================================== */
+
+const selectorFotos =
+    document.getElementById(
+        "selectorFotos"
+    );
+
+const contador =
+    document.getElementById(
+        "contador"
+    );
+
+const referencia =
+    document.getElementById(
+        "referencia"
+    );
+
+const tablero =
+    document.getElementById(
+        "tablero"
+    );
+
+const mensaje =
+    document.getElementById(
+        "mensaje"
+    );
 
 
 /* =====================================================
-   ELEGIR IMAGEN ALEATORIA
+   AÑADIR FOTOS
+===================================================== */
+
+selectorFotos.addEventListener(
+    "change",
+    function(evento) {
+
+        const archivos =
+            Array.from(
+                evento.target.files
+            );
+
+
+        /*
+         * Convertimos cada fotografía
+         * en una URL que puede utilizar
+         * el navegador.
+         */
+
+        archivos.forEach(
+            function(archivo) {
+
+                if (
+                    archivo.type.startsWith(
+                        "image/"
+                    )
+                ) {
+
+                    const url =
+                        URL.createObjectURL(
+                            archivo
+                        );
+
+                    fotos.push(url);
+
+                }
+
+            }
+        );
+
+
+        /*
+         * Actualizar contador.
+         */
+
+        contador.textContent =
+            fotos.length +
+            (
+                fotos.length === 1
+                    ? " foto añadida"
+                    : " fotos añadidas"
+            );
+
+
+        /*
+         * Si es la primera vez,
+         * comenzar automáticamente.
+         */
+
+        if (
+            fotos.length > 0 &&
+            !imagenActual
+        ) {
+
+            elegirImagen();
+
+            crearPuzzle();
+
+        }
+        else if (
+            fotos.length > 0
+        ) {
+
+            mensaje.textContent =
+                "📸 Fotos añadidas. Puedes elegir otra imagen.";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   ELEGIR FOTO ALEATORIA
 ===================================================== */
 
 function elegirImagen() {
 
-    if (imagenes.length === 0) {
+    if (fotos.length === 0) {
 
         return;
 
     }
 
 
-    let indice;
+    let nueva;
+
 
     do {
 
-        indice =
+        const numero =
             Math.floor(
                 Math.random() *
-                imagenes.length
+                fotos.length
             );
+
+        nueva =
+            fotos[numero];
 
     }
     while (
-        imagenes.length > 1 &&
-        imagenes[indice] === imagenActual
+        fotos.length > 1 &&
+        nueva === imagenActual
     );
 
 
     imagenActual =
-        imagenes[indice];
+        nueva;
 
 }
 
 
 /* =====================================================
-   CREAR UNA PIEZA
+   CREAR PIEZA
 ===================================================== */
 
 function crearPieza(posicion) {
@@ -489,16 +623,17 @@ function crearPieza(posicion) {
 
 
     /*
-       Posición de la imagen.
-
-       Tenemos una cuadrícula 5 x 5.
-    */
+     * Cada pieza representa
+     * una zona de la imagen.
+     */
 
     const columna =
         posicion % 5;
 
     const fila =
-        Math.floor(posicion / 5);
+        Math.floor(
+            posicion / 5
+        );
 
 
     const x =
@@ -521,12 +656,13 @@ function crearPieza(posicion) {
 
 
     /*
-       Activar arrastre.
-    */
+     * Arrastrar con ratón
+     * o con pantalla táctil.
+     */
 
     pieza.addEventListener(
         "pointerdown",
-        empezarArrastre
+        comenzarArrastre
     );
 
 
@@ -536,64 +672,52 @@ function crearPieza(posicion) {
 
 
 /* =====================================================
-   CREAR EL PUZZLE
+   CREAR PUZZLE
 ===================================================== */
 
 function crearPuzzle() {
+
+    if (!imagenActual) {
+
+        return;
+
+    }
+
 
     tablero.innerHTML = "";
 
 
     /*
-       Mostrar imagen completa.
-    */
+     * Mostrar referencia.
+     */
 
     referencia.style.backgroundImage =
         `url("${imagenActual}")`;
 
 
     /*
-       Crear posiciones 0-24.
-    */
+     * Crear posiciones.
+     */
 
-    let posiciones = [];
-
-    for (
-        let i = 0;
-        i < 25;
-        i++
-    ) {
-
-        posiciones.push(i);
-
-    }
+    let posiciones =
+        Array.from(
+            { length: 25 },
+            (_, i) => i
+        );
 
 
     /*
-       Mezclar.
+     * Mezclar.
+     */
 
-       Evitamos que el puzzle aparezca
-       ya terminado.
-    */
-
-    do {
-
-        posiciones.sort(
-            () => Math.random() - 0.5
-        );
-
-    }
-    while (
-        posiciones.every(
-            (valor, indice) =>
-                valor === indice
-        )
+    posiciones.sort(
+        () => Math.random() - 0.5
     );
 
 
     /*
-       Crear 25 huecos.
-    */
+     * Crear 25 huecos.
+     */
 
     for (
         let i = 0;
@@ -602,25 +726,18 @@ function crearPuzzle() {
     ) {
 
         const hueco =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
         hueco.className =
             "hueco";
 
 
-        /*
-           Guardamos cuál es la posición
-           correcta de este hueco.
-        */
-
         hueco.dataset.posicion =
             i;
 
-
-        /*
-           Ponemos una pieza aleatoria.
-        */
 
         const pieza =
             crearPieza(
@@ -644,16 +761,16 @@ function crearPuzzle() {
 
 
     mensaje.textContent =
-        "🧩 Arrastra cada pieza hasta su sitio.";
+        "🧩 Arrastra las piezas hasta su sitio.";
 
 }
 
 
 /* =====================================================
-   EMPEZAR A ARRASTRAR
+   COMENZAR ARRASTRE
 ===================================================== */
 
-function empezarArrastre(evento) {
+function comenzarArrastre(evento) {
 
     evento.preventDefault();
 
@@ -666,6 +783,320 @@ function empezarArrastre(evento) {
         piezaArrastrada.parentElement;
 
 
+    piezaArrastrada.classList.add(
+        "arrastrando"
+    );
+
+
     /*
-       Guardamos la posición del
-```
+     * Capturar el dedo o ratón.
+     */
+
+    piezaArrastrada.setPointerCapture(
+        evento.pointerId
+    );
+
+
+    piezaArrastrada.addEventListener(
+        "pointerup",
+        terminarArrastre
+    );
+
+
+    piezaArrastrada.addEventListener(
+        "pointercancel",
+        cancelarArrastre
+    );
+
+}
+
+
+/* =====================================================
+   TERMINAR ARRASTRE
+===================================================== */
+
+function terminarArrastre(evento) {
+
+    if (!piezaArrastrada) {
+
+        return;
+
+    }
+
+
+    const x =
+        evento.clientX;
+
+    const y =
+        evento.clientY;
+
+
+    /*
+     * Ocultamos momentáneamente
+     * la pieza para averiguar qué
+     * hay debajo.
+     */
+
+    piezaArrastrada.style.display =
+        "none";
+
+
+    const elemento =
+        document.elementFromPoint(
+            x,
+            y
+        );
+
+
+    piezaArrastrada.style.display =
+        "";
+
+
+    const destino =
+        elemento
+            ? elemento.closest(".hueco")
+            : null;
+
+
+    /*
+     * Solo movemos si realmente
+     * se ha soltado sobre un hueco.
+     */
+
+    if (
+        destino &&
+        destino !== huecoOrigen
+    ) {
+
+        intercambiar(
+            huecoOrigen,
+            destino
+        );
+
+    }
+
+
+    limpiarArrastre();
+
+
+    comprobarPuzzle();
+
+}
+
+
+/* =====================================================
+   INTERCAMBIAR PIEZAS
+===================================================== */
+
+function intercambiar(
+    origen,
+    destino
+) {
+
+    const piezaOrigen =
+        origen.querySelector(
+            ".pieza"
+        );
+
+
+    const piezaDestino =
+        destino.querySelector(
+            ".pieza"
+        );
+
+
+    if (!piezaOrigen) {
+
+        return;
+
+    }
+
+
+    /*
+     * Guardamos temporalmente
+     * la pieza de destino.
+     */
+
+    if (piezaDestino) {
+
+        origen.appendChild(
+            piezaDestino
+        );
+
+    }
+
+
+    destino.appendChild(
+        piezaOrigen
+    );
+
+}
+
+
+/* =====================================================
+   CANCELAR
+===================================================== */
+
+function cancelarArrastre() {
+
+    limpiarArrastre();
+
+}
+
+
+/* =====================================================
+   LIMPIAR
+===================================================== */
+
+function limpiarArrastre() {
+
+    if (!piezaArrastrada) {
+
+        return;
+
+    }
+
+
+    piezaArrastrada.classList.remove(
+        "arrastrando"
+    );
+
+
+    piezaArrastrada = null;
+
+    huecoOrigen = null;
+
+}
+
+
+/* =====================================================
+   COMPROBAR
+===================================================== */
+
+function comprobarPuzzle() {
+
+    const huecos =
+        tablero.querySelectorAll(
+            ".hueco"
+        );
+
+
+    let terminado = true;
+
+
+    huecos.forEach(
+        function(hueco) {
+
+            const pieza =
+                hueco.querySelector(
+                    ".pieza"
+                );
+
+
+            if (!pieza) {
+
+                terminado = false;
+
+                return;
+
+            }
+
+
+            const correcto =
+                Number(
+                    hueco.dataset.posicion
+                ) ===
+                Number(
+                    pieza.dataset.posicion
+                );
+
+
+            if (correcto) {
+
+                hueco.classList.add(
+                    "correcto"
+                );
+
+            }
+            else {
+
+                hueco.classList.remove(
+                    "correcto"
+                );
+
+                terminado = false;
+
+            }
+
+        }
+    );
+
+
+    if (terminado) {
+
+        mensaje.textContent =
+            "🎉 ¡PUZZLE TERMINADO! 🎉";
+
+    }
+
+}
+
+
+/* =====================================================
+   NUEVA IMAGEN
+===================================================== */
+
+document
+    .getElementById("nuevo")
+    .addEventListener(
+        "click",
+        function() {
+
+            if (fotos.length === 0) {
+
+                mensaje.textContent =
+                    "📸 Primero añade alguna foto.";
+
+                return;
+
+            }
+
+
+            elegirImagen();
+
+            crearPuzzle();
+
+        }
+    );
+
+
+/* =====================================================
+   MEZCLAR
+===================================================== */
+
+document
+    .getElementById("mezclar")
+    .addEventListener(
+        "click",
+        function() {
+
+            if (fotos.length === 0) {
+
+                mensaje.textContent =
+                    "📸 Primero añade alguna foto.";
+
+                return;
+
+            }
+
+
+            crearPuzzle();
+
+        }
+    );
+
+
+</script>
+
+</body>
+</html>
